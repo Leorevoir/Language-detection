@@ -7,8 +7,10 @@
 ##
 
 import unittest
+from unittest.mock import patch
 import sys
 import os
+import io
 import tempfile
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,6 +38,53 @@ class TestLanguageDetection(unittest.TestCase):
         with open(self.cyrillic_file.name, 'w') as f:
             f.write("Letter;Russian;Ukrainian\n")
             f.write("б;5;8\n")
+
+    def test_parse_arguments_too_few(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                argv = ['language_detection.py']
+                parse_arguments(argv)
+            self.assertEqual(cm.exception.code, 84)
+            self.assertIn("Too few arguments, try language_detection.py -h for help", mock_stdout.getvalue())
+
+    def test_parse_arguments_too_many(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                argv = ['language_detection.py', 'file1', 'file2']
+                parse_arguments(argv)
+            self.assertEqual(cm.exception.code, 84)
+            self.assertIn("Too many arguments, try language_detection.py -h for help", mock_stdout.getvalue())
+
+    def test_parse_arguments_h(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                argv = ['language_detection.py', '-h']
+                parse_arguments(argv)
+        expected_output = "Welcome to my EPITECH Project !\n\nDESCRIPTION:\n   This is a small HUB project that recognizes language\n\nUSAGE:\n   ./language_detection.py <filename>\n\nCopyright (©) Léo QUINZLER Tek1 PGE 2028\n"
+        self.assertEqual(cm.exception.code, 0)
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+    def test_print_usage(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                print_usage()
+        expected_output = "Welcome to my EPITECH Project !\n\nDESCRIPTION:\n   This is a small HUB project that recognizes language\n\nUSAGE:\n   ./language_detection.py <filename>\n\nCopyright (©) Léo QUINZLER Tek1 PGE 2028\n"
+        self.assertEqual(cm.exception.code, 0)
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+    def test_wrong_txt_file(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                try_open("nonexistent_file.txt")
+            self.assertEqual(cm.exception.code, 84)
+            self.assertIn("Error: File nonexistent_file.txt not found", mock_stdout.getvalue())
+
+    def test_wrong_csv_file(self):
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            with self.assertRaises(SystemExit) as cm:
+                try_csv("nonexistent_file.csv")
+            self.assertEqual(cm.exception.code, 84)
+            self.assertIn("Error: File nonexistent_file.csv not found.", mock_stdout.getvalue())
 
     def test_english(self):
         self.assertEqual(detect_language(english_text, self.letter_frequencies, self.languages), 'English')

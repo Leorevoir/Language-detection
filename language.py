@@ -53,7 +53,7 @@ def calculate_score(text_frequencies, letter_frequencies, language):
     return score
 
 def main():
-    file_path = parse_arguments()
+    file_path = parse_arguments(sys.argv)
 
     text = try_open(file_path)
     latine_file = try_csv("data/occurrence/latine.csv")
