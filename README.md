@@ -9,4 +9,5 @@
 - [Letter occurrence generator](https://github.com/Leorevoir/Language-detection/tree/main/script) - ./occurrence_generator -h
 - [Unit tests](https://github.com/Leorevoir/Language-detection/tree/main/data) - compiled with a Makefile make rule
 
-`You can also check my [others repo](https://github.com/Leorevoir/Epitech-projects) !😆`
+
+You can also check my [others repo](https://github.com/Leorevoir/Epitech-projects) !😆
